@@ -7,6 +7,7 @@ import { clearAuth, getRefreshToken, getUser } from "@/lib/auth";
 import { api } from "@/lib/api";
 import {
   Shield,
+  ShieldCheck,
   LayoutDashboard,
   FileSearch,
   Building2,
@@ -51,7 +52,7 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 space-y-1 p-3">
-        {navItems.map((item) => {
+        {[...navItems, ...(user?.is_admin ? [{ href: "/dashboard/admin", label: "Admin", icon: ShieldCheck }] : [])].map((item) => {
           const active =
             pathname === item.href ||
             (item.href !== "/dashboard" && pathname.startsWith(item.href));

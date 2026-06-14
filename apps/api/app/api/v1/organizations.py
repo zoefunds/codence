@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, require_verified_email
 from app.db.session import get_db
 from app.models.organization import OrgMember, Organization
 from app.models.user import User
@@ -33,7 +33,7 @@ async def _check_org_admin(db: AsyncSession, user_id: uuid.UUID, org_id: uuid.UU
 @router.post("", response_model=OrgResponse, status_code=status.HTTP_201_CREATED)
 async def create_org(
     body: OrgCreateRequest,
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_verified_email),
     db: AsyncSession = Depends(get_db),
 ):
     existing = await db.execute(select(Organization).where(Organization.slug == body.slug))
@@ -53,7 +53,7 @@ async def create_org(
 
 @router.get("", response_model=list[OrgResponse])
 async def list_orgs(
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_verified_email),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
@@ -68,7 +68,7 @@ async def list_orgs(
 @router.get("/{org_id}/members", response_model=list[OrgMemberResponse])
 async def list_members(
     org_id: uuid.UUID,
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_verified_email),
     db: AsyncSession = Depends(get_db),
 ):
     check = await db.execute(
@@ -99,7 +99,7 @@ async def list_members(
 async def invite_member(
     org_id: uuid.UUID,
     body: InviteMemberRequest,
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_verified_email),
     db: AsyncSession = Depends(get_db),
 ):
     await _check_org_admin(db, user.id, org_id)
@@ -141,7 +141,7 @@ async def update_member_role(
     org_id: uuid.UUID,
     member_id: uuid.UUID,
     body: UpdateRoleRequest,
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_verified_email),
     db: AsyncSession = Depends(get_db),
 ):
     await _check_org_admin(db, user.id, org_id)
@@ -176,7 +176,7 @@ async def update_member_role(
 async def remove_member(
     org_id: uuid.UUID,
     member_id: uuid.UUID,
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_verified_email),
     db: AsyncSession = Depends(get_db),
 ):
     await _check_org_admin(db, user.id, org_id)

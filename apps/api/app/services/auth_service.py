@@ -10,13 +10,16 @@ from app.core.config import settings
 from app.core.security import (
     create_access_token,
     create_refresh_token,
+    generate_verification_token,
     hash_password,
     verify_password,
 )
 from app.models.auth import Session
+from app.models.email_token import EmailToken
 from app.models.organization import OrgMember, Organization
 from app.models.user import User
 from app.models.wallet import Wallet
+from app.services.email_service import send_verification_email
 from app.services.wallet_service import create_wallet
 
 
@@ -68,6 +71,15 @@ async def signup(
     )
     db.add(wallet)
 
+    token, token_hash = generate_verification_token()
+    email_token = EmailToken(
+        user_id=user.id,
+        token_hash=token_hash,
+        token_type="verification",
+        expires_at=datetime.now(timezone.utc) + timedelta(hours=24),
+    )
+    db.add(email_token)
+
     access_token = create_access_token(str(user.id), {"org_id": str(personal_org.id)})
     refresh_token, refresh_hash = create_refresh_token()
 
@@ -82,6 +94,8 @@ async def signup(
 
     await db.flush()
 
+    await send_verification_email(user.email, user.display_name, token)
+
     return {
         "user": {
             "id": user.id,
@@ -89,6 +103,7 @@ async def signup(
             "display_name": user.display_name,
             "avatar_url": user.avatar_url,
             "email_verified": user.email_verified_at is not None,
+            "is_admin": user.is_admin,
             "wallet_address": wallet_data["address"],
             "personal_org_id": personal_org.id,
             "created_at": user.created_at,
@@ -138,6 +153,7 @@ async def login(
             "display_name": user.display_name,
             "avatar_url": user.avatar_url,
             "email_verified": user.email_verified_at is not None,
+            "is_admin": user.is_admin,
             "wallet_address": wallet.address if wallet else None,
             "personal_org_id": user.personal_org_id,
             "created_at": user.created_at,
@@ -197,6 +213,7 @@ async def refresh(
             "display_name": user.display_name,
             "avatar_url": user.avatar_url,
             "email_verified": user.email_verified_at is not None,
+            "is_admin": user.is_admin,
             "wallet_address": wallet.address if wallet else None,
             "personal_org_id": user.personal_org_id,
             "created_at": user.created_at,

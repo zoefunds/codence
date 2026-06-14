@@ -70,6 +70,10 @@ class Settings(BaseSettings):
     GITHUB_APP_PRIVATE_KEY: str = ""
     GITHUB_WEBHOOK_SECRET: str = ""
 
+    # Brevo (email)
+    BREVO_API_KEY: str = ""
+    FRONTEND_URL: str = "https://codence-app.vercel.app"
+
     # CORS
     CORS_ORIGINS: list[str] = ["http://localhost:3000", "https://codence-app.vercel.app"]
 

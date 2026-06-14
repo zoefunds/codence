@@ -8,7 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, require_verified_email
 from app.db.session import get_db, async_session_factory
 from app.models.finding import ConsensusResult, Finding
 from app.models.organization import OrgMember
@@ -137,7 +137,7 @@ async def _run_chain_review(review_id: uuid.UUID, code_content: str, language: s
 async def create_review_paste(
     body: ReviewCreatePaste,
     background_tasks: BackgroundTasks,
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_verified_email),
     db: AsyncSession = Depends(get_db),
 ):
     await _check_org_access(db, user.id, body.org_id)
@@ -205,7 +205,7 @@ async def create_review_paste(
 @router.get("/stats")
 async def review_stats(
     org_id: uuid.UUID,
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_verified_email),
     db: AsyncSession = Depends(get_db),
 ):
     await _check_org_access(db, user.id, org_id)
@@ -232,7 +232,7 @@ async def list_reviews(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     status_filter: str | None = Query(None, alias="status"),
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_verified_email),
     db: AsyncSession = Depends(get_db),
 ):
     await _check_org_access(db, user.id, org_id)
@@ -261,7 +261,7 @@ async def list_reviews(
 @router.get("/{review_id}", response_model=ReviewDetailResponse)
 async def get_review(
     review_id: uuid.UUID,
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_verified_email),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
@@ -287,7 +287,7 @@ async def flag_finding(
     review_id: uuid.UUID,
     finding_id: uuid.UUID,
     body: FlagRequest,
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_verified_email),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
@@ -319,7 +319,7 @@ async def flag_finding(
 async def unflag_finding(
     review_id: uuid.UUID,
     finding_id: uuid.UUID,
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_verified_email),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
@@ -351,7 +351,7 @@ async def unflag_finding(
 async def appeal_review(
     review_id: uuid.UUID,
     body: AppealRequest,
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_verified_email),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(select(Review).where(Review.id == review_id))

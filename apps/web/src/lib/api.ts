@@ -157,6 +157,30 @@ export const api = {
 
   updateMe: (data: { display_name?: string; avatar_url?: string }, token: string) =>
     request("/users/me", { method: "PUT", body: JSON.stringify(data), token }),
+
+  verifyEmail: (token: string) =>
+    request("/auth/verify-email", { method: "POST", body: JSON.stringify({ token }) }),
+
+  resendVerification: (email: string) =>
+    request("/auth/resend-verification", { method: "POST", body: JSON.stringify({ email }) }),
+
+  forgotPassword: (email: string) =>
+    request("/auth/forgot-password", { method: "POST", body: JSON.stringify({ email }) }),
+
+  resetPassword: (token: string, new_password: string) =>
+    request("/auth/reset-password", { method: "POST", body: JSON.stringify({ token, new_password }) }),
+
+  exportWallet: (password: string, token: string) =>
+    request<{ private_key: string }>("/users/me/export-wallet", { method: "POST", body: JSON.stringify({ password }), token }),
+
+  getAdminStats: (token: string) =>
+    request("/admin/stats", { token }),
+
+  getAdminUsers: (page: number, token: string) =>
+    request("/admin/users?page=" + page, { token }),
+
+  updateUserRole: (userId: string, isAdmin: boolean, token: string) =>
+    request(`/admin/users/${userId}/role`, { method: "PUT", body: JSON.stringify({ is_admin: isAdmin }), token }),
 };
 
 export { ApiError };

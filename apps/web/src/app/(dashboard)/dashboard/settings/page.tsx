@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getAccessToken, getUser, setUser } from "@/lib/auth";
 import { api, ApiError } from "@/lib/api";
-import { Shield, Wallet, Mail, Pencil } from "lucide-react";
+import { Shield, Wallet, Mail, Pencil, Key, Copy, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 export default function SettingsPage() {
@@ -15,6 +15,10 @@ export default function SettingsPage() {
   const [editing, setEditing] = useState(false);
   const [displayName, setDisplayName] = useState((user?.display_name as string) || "");
   const [saving, setSaving] = useState(false);
+  const [showExport, setShowExport] = useState(false);
+  const [exportPassword, setExportPassword] = useState("");
+  const [exporting, setExporting] = useState(false);
+  const [privateKey, setPrivateKey] = useState("");
 
   async function handleSave() {
     const token = getAccessToken();
@@ -29,6 +33,21 @@ export default function SettingsPage() {
       toast.error(err instanceof ApiError ? err.detail : "Failed to update");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleExportWallet(e: React.FormEvent) {
+    e.preventDefault();
+    const token = getAccessToken();
+    if (!token) return;
+    setExporting(true);
+    try {
+      const data: any = await api.exportWallet(exportPassword, token);
+      setPrivateKey(data.private_key);
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.detail : "Failed to export wallet");
+    } finally {
+      setExporting(false);
     }
   }
 
@@ -108,6 +127,61 @@ export default function SettingsPage() {
           <div className="flex justify-between">
             <span className="text-sm text-muted-foreground">Gas Token</span>
             <Badge variant="outline">GEN</Badge>
+          </div>
+          <div className="border-t border-border/40 pt-3">
+            {!showExport ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => { setShowExport(true); setPrivateKey(""); setExportPassword(""); }}
+                className="w-full"
+              >
+                <Key className="mr-2 h-3 w-3" />
+                Export Private Key
+              </Button>
+            ) : privateKey ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Input
+                    readOnly
+                    value={privateKey}
+                    className="font-mono text-xs"
+                  />
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => { navigator.clipboard.writeText(privateKey); toast.success("Copied!"); }}
+                  >
+                    <Copy className="h-3 w-3" />
+                  </Button>
+                </div>
+                <div className="flex items-start gap-2 rounded-md bg-destructive/10 p-2">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 text-destructive shrink-0" />
+                  <p className="text-xs text-destructive">Never share your private key. Anyone with it can access your wallet.</p>
+                </div>
+                <Button variant="ghost" size="sm" className="w-full" onClick={() => { setShowExport(false); setPrivateKey(""); }}>
+                  Close
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleExportWallet} className="space-y-3">
+                <Input
+                  type="password"
+                  placeholder="Enter your account password"
+                  value={exportPassword}
+                  onChange={(e) => setExportPassword(e.target.value)}
+                  required
+                />
+                <div className="flex gap-2">
+                  <Button type="submit" size="sm" disabled={exporting} className="flex-1">
+                    {exporting ? "Exporting..." : "Confirm"}
+                  </Button>
+                  <Button type="button" size="sm" variant="ghost" onClick={() => setShowExport(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            )}
           </div>
         </CardContent>
       </Card>

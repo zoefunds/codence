@@ -23,6 +23,7 @@ class User(Base, TimestampMixin):
         ForeignKey("organizations.id"), nullable=True
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     personal_org = relationship("Organization", foreign_keys=[personal_org_id])

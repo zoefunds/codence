@@ -32,6 +32,7 @@ class UserResponse(BaseModel):
     display_name: str
     avatar_url: str | None
     email_verified: bool
+    is_admin: bool = False
     wallet_address: str | None
     personal_org_id: uuid.UUID | None
     created_at: datetime
@@ -42,3 +43,20 @@ class UserResponse(BaseModel):
 class AuthResponse(BaseModel):
     user: UserResponse
     tokens: TokenResponse
+
+
+class VerifyEmailRequest(BaseModel):
+    token: str
+
+
+class ResendVerificationRequest(BaseModel):
+    email: EmailStr
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str = Field(min_length=8, max_length=128)
