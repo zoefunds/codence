@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, CheckCircle } from "lucide-react";
+import { Terminal, CheckCircle } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -34,7 +34,9 @@ function ResetPasswordForm() {
       await api.resetPassword(token, password);
       setSuccess(true);
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.detail : "Something went wrong");
+      toast.error(
+        err instanceof ApiError ? err.detail : "Something went wrong"
+      );
     } finally {
       setLoading(false);
     }
@@ -43,19 +45,26 @@ function ResetPasswordForm() {
   return (
     <Card className="w-full max-w-md border-border/40">
       <CardHeader className="text-center">
-        <Link href="/" className="mb-4 inline-flex items-center justify-center gap-2">
-          <Shield className="h-8 w-8 text-primary" />
-          <span className="text-2xl font-bold">Codence</span>
+        <Link
+          href="/"
+          className="mb-4 inline-flex items-center justify-center gap-2.5"
+        >
+          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
+            <Terminal className="h-4 w-4" />
+          </div>
+          <span className="font-mono text-2xl font-bold">Codence</span>
         </Link>
-        <CardTitle className="text-xl">Reset Password</CardTitle>
+        <CardTitle className="font-mono text-lg">Reset Password</CardTitle>
       </CardHeader>
       <CardContent>
         {success ? (
           <div className="space-y-4 text-center">
             <CheckCircle className="mx-auto h-12 w-12 text-green-600" />
-            <p className="font-medium">Password reset successfully!</p>
+            <p className="font-mono text-sm font-medium">
+              Password reset successfully!
+            </p>
             <Link href="/login">
-              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono">
                 Go to Login
               </Button>
             </Link>
@@ -63,14 +72,38 @@ function ResetPasswordForm() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="password">New Password</Label>
-              <Input id="password" type="password" placeholder="Enter new password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <Label htmlFor="password" className="font-mono text-xs">
+                New Password
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter new password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="font-mono text-sm"
+                required
+              />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirm Password</Label>
-              <Input id="confirm-password" type="password" placeholder="Confirm new password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+              <Label htmlFor="confirm-password" className="font-mono text-xs">
+                Confirm Password
+              </Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                placeholder="Confirm new password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="font-mono text-sm"
+                required
+              />
             </div>
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" disabled={loading || !token}>
+            <Button
+              type="submit"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono"
+              disabled={loading || !token}
+            >
               {loading ? "Resetting..." : "Reset Password"}
             </Button>
           </form>
@@ -83,7 +116,11 @@ function ResetPasswordForm() {
 export default function ResetPasswordPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <Suspense fallback={<div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />}>
+      <Suspense
+        fallback={
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        }
+      >
         <ResetPasswordForm />
       </Suspense>
     </div>

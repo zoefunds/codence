@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, CheckCircle } from "lucide-react";
+import { Terminal, CheckCircle } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -36,20 +36,24 @@ export default function ForgotPasswordPage() {
         <CardHeader className="text-center">
           <Link
             href="/"
-            className="mb-4 inline-flex items-center justify-center gap-2"
+            className="mb-4 inline-flex items-center justify-center gap-2.5"
           >
-            <Shield className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold">Codence</span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
+              <Terminal className="h-4 w-4" />
+            </div>
+            <span className="font-mono text-2xl font-bold">Codence</span>
           </Link>
-          <CardTitle className="text-xl">Forgot Password</CardTitle>
+          <CardTitle className="font-mono text-lg">Forgot Password</CardTitle>
         </CardHeader>
         <CardContent>
           {sent ? (
             <div className="space-y-4 text-center">
               <CheckCircle className="mx-auto h-12 w-12 text-green-600" />
-              <p className="font-medium">Check your email for a reset link.</p>
+              <p className="font-mono text-sm font-medium">
+                Check your email for a reset link.
+              </p>
               <Link href="/login">
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full font-mono text-sm">
                   Back to Login
                 </Button>
               </Link>
@@ -57,24 +61,27 @@ export default function ForgotPasswordPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="font-mono text-xs">
+                  Email
+                </Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="you@company.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  className="font-mono text-sm"
                   required
                 />
               </div>
               <Button
                 type="submit"
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono"
                 disabled={loading}
               >
                 {loading ? "Sending..." : "Send Reset Link"}
               </Button>
-              <p className="text-center text-sm text-muted-foreground">
+              <p className="text-center font-mono text-xs text-muted-foreground">
                 <Link href="/login" className="text-primary hover:underline">
                   Back to Login
                 </Link>

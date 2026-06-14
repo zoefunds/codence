@@ -16,7 +16,7 @@ import {
 import { getAccessToken, getUser } from "@/lib/auth";
 import { api, ApiError } from "@/lib/api";
 import { toast } from "sonner";
-import { Building2, Plus, Users, UserPlus, Trash2 } from "lucide-react";
+import { Building2, Plus, Users, UserPlus, Trash2, Terminal } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 export default function OrganizationsPage() {
@@ -145,13 +145,13 @@ export default function OrganizationsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Organizations</h1>
-          <p className="text-muted-foreground">
+          <h1 className="font-mono text-2xl font-bold">Organizations</h1>
+          <p className="font-mono text-sm text-muted-foreground">
             Manage your teams and workspaces.
           </p>
         </div>
         <Button
-          className="bg-primary hover:bg-primary/90 text-primary-foreground"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground font-mono text-sm"
           onClick={() => setShowCreate(!showCreate)}
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -162,12 +162,12 @@ export default function OrganizationsPage() {
       {showCreate && (
         <Card className="border-border/40">
           <CardHeader>
-            <CardTitle>Create Organization</CardTitle>
+            <CardTitle className="font-mono text-base">Create Organization</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleCreate} className="space-y-4">
               <div className="space-y-2">
-                <Label>Name</Label>
+                <Label className="font-mono text-xs">Name</Label>
                 <Input
                   value={name}
                   onChange={(e) => {
@@ -180,19 +180,21 @@ export default function OrganizationsPage() {
                     );
                   }}
                   placeholder="Acme Corp"
+                  className="font-mono text-sm"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label>Slug</Label>
+                <Label className="font-mono text-xs">Slug</Label>
                 <Input
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
                   placeholder="acme-corp"
+                  className="font-mono text-sm"
                   required
                 />
               </div>
-              <Button type="submit" disabled={creating}>
+              <Button type="submit" disabled={creating} className="font-mono text-sm">
                 {creating ? "Creating..." : "Create"}
               </Button>
             </form>
@@ -201,7 +203,7 @@ export default function OrganizationsPage() {
       )}
 
       {loading ? (
-        <p className="text-muted-foreground">Loading...</p>
+        <p className="font-mono text-sm text-muted-foreground">Loading...</p>
       ) : (
         <div className="space-y-4">
           {orgs.map((org: any) => (
@@ -215,34 +217,34 @@ export default function OrganizationsPage() {
                     <Building2 className="h-6 w-6 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium">{org.name}</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="font-mono text-sm font-medium">{org.name}</p>
+                    <p className="font-mono text-xs text-muted-foreground">
                       /{org.slug} &middot; {formatDate(org.created_at)}
                     </p>
                   </div>
-                  <Badge variant="outline">{org.type}</Badge>
+                  <Badge variant="outline" className="font-mono text-xs">{org.type}</Badge>
                 </CardContent>
               </Card>
 
               {selectedOrg?.id === org.id && (
                 <Card className="mt-2 border-border/40">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <Users className="h-4 w-4" />
+                    <CardTitle className="flex items-center gap-2 font-mono text-base">
+                      <Users className="h-4 w-4 text-primary" />
                       Members
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {membersLoading ? (
-                      <p className="text-sm text-muted-foreground">Loading members...</p>
+                      <p className="font-mono text-sm text-muted-foreground">Loading members...</p>
                     ) : (
                       <>
                         <div className="space-y-2">
                           {members.map((member: any) => (
                             <div key={member.id} className="flex items-center justify-between rounded-lg border border-border/40 p-3">
                               <div>
-                                <p className="text-sm font-medium">{member.display_name}</p>
-                                <p className="text-xs text-muted-foreground">{member.email}</p>
+                                <p className="font-mono text-sm font-medium">{member.display_name}</p>
+                                <p className="font-mono text-xs text-muted-foreground">{member.email}</p>
                               </div>
                               <div className="flex items-center gap-2">
                                 {isOrgAdmin && member.role !== "owner" ? (
@@ -250,7 +252,7 @@ export default function OrganizationsPage() {
                                     <select
                                       value={member.role}
                                       onChange={(e) => handleRoleChange(member.id, e.target.value)}
-                                      className="h-8 rounded-md border border-border/40 bg-background px-2 text-xs"
+                                      className="h-8 rounded-md border border-border/40 bg-background px-2 font-mono text-xs"
                                     >
                                       <option value="admin">Admin</option>
                                       <option value="reviewer">Reviewer</option>
@@ -276,26 +278,26 @@ export default function OrganizationsPage() {
                         {isOrgAdmin && (
                           <form onSubmit={handleInvite} className="flex items-end gap-2 border-t border-border/40 pt-4">
                             <div className="flex-1 space-y-1">
-                              <Label className="text-xs">Invite by email</Label>
+                              <Label className="font-mono text-xs">Invite by email</Label>
                               <Input
                                 value={inviteEmail}
                                 onChange={(e) => setInviteEmail(e.target.value)}
                                 placeholder="user@example.com"
                                 type="email"
                                 required
-                                className="h-9"
+                                className="h-9 font-mono text-sm"
                               />
                             </div>
                             <select
                               value={inviteRole}
                               onChange={(e) => setInviteRole(e.target.value)}
-                              className="h-9 rounded-md border border-border/40 bg-background px-2 text-sm"
+                              className="h-9 rounded-md border border-border/40 bg-background px-2 font-mono text-sm"
                             >
                               <option value="viewer">Viewer</option>
                               <option value="reviewer">Reviewer</option>
                               <option value="admin">Admin</option>
                             </select>
-                            <Button type="submit" size="sm" className="h-9" disabled={inviting}>
+                            <Button type="submit" size="sm" className="h-9 font-mono text-xs" disabled={inviting}>
                               <UserPlus className="mr-1 h-3 w-3" />
                               {inviting ? "..." : "Invite"}
                             </Button>

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield } from "lucide-react";
+import { Terminal } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import { setTokens, setUser } from "@/lib/auth";
 import { toast } from "sonner";
@@ -25,12 +25,11 @@ export default function LoginPage() {
       const data: any = await api.login({ email, password });
       setTokens(data.tokens.access_token, data.tokens.refresh_token);
       setUser(data.user);
-      toast.success("Welcome back!");
       router.push("/dashboard");
     } catch (err) {
-      const message =
-        err instanceof ApiError ? err.detail : "Something went wrong";
-      toast.error(message);
+      toast.error(
+        err instanceof ApiError ? err.detail : "Something went wrong"
+      );
     } finally {
       setLoading(false);
     }
@@ -40,50 +39,64 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md border-border/40">
         <CardHeader className="text-center">
-          <Link href="/" className="mb-4 inline-flex items-center justify-center gap-2">
-            <Shield className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold">Codence</span>
+          <Link
+            href="/"
+            className="mb-4 inline-flex items-center justify-center gap-2.5"
+          >
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
+              <Terminal className="h-4 w-4" />
+            </div>
+            <span className="font-mono text-2xl font-bold">Codence</span>
           </Link>
-          <CardTitle className="text-xl">Welcome back</CardTitle>
+          <CardTitle className="font-mono text-lg">Welcome back</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="font-mono text-xs">
+                Email
+              </Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="you@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="font-mono text-sm"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="font-mono text-xs">
+                Password
+              </Label>
               <Input
                 id="password"
                 type="password"
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="font-mono text-sm"
                 required
               />
-            </div>
-            <div className="flex justify-end">
-              <Link href="/forgot-password" className="text-sm text-primary hover:underline">
-                Forgot password?
-              </Link>
+              <div className="flex justify-end">
+                <Link
+                  href="/forgot-password"
+                  className="font-mono text-xs text-primary hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
             </div>
             <Button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono"
               disabled={loading}
             >
-              {loading ? "Signing in..." : "Sign in"}
+              {loading ? "Authenticating..." : "Sign in"}
             </Button>
           </form>
-          <p className="mt-6 text-center text-sm text-muted-foreground">
+          <p className="mt-4 text-center font-mono text-xs text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link href="/signup" className="text-primary hover:underline">
               Sign up

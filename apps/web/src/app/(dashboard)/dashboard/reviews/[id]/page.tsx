@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { getAccessToken } from "@/lib/auth";
 import { api, ApiError } from "@/lib/api";
 import { statusColor, severityColor, formatDate } from "@/lib/utils";
-import { Shield, FileSearch, AlertTriangle, Flag, Scale } from "lucide-react";
+import { Shield, FileSearch, AlertTriangle, Flag, Scale, Terminal } from "lucide-react";
 import { toast } from "sonner";
 
 const TERMINAL_STATUSES = new Set(["done", "failed"]);
@@ -123,7 +123,7 @@ export default function ReviewDetailPage() {
   }
 
   if (!data) {
-    return <p className="text-muted-foreground">Review not found.</p>;
+    return <p className="font-mono text-sm text-muted-foreground">Review not found.</p>;
   }
 
   const { review, findings, consensus } = data;
@@ -132,8 +132,8 @@ export default function ReviewDetailPage() {
     <div className="space-y-8">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold">{review.title}</h1>
-          <p className="text-muted-foreground">
+          <h1 className="font-mono text-2xl font-bold">{review.title}</h1>
+          <p className="font-mono text-sm text-muted-foreground">
             {review.source} &middot; {formatDate(review.created_at)}
           </p>
         </div>
@@ -141,20 +141,20 @@ export default function ReviewDetailPage() {
           {review.status === "done" && findings.length > 0 && (
             <Dialog open={appealOpen} onOpenChange={setAppealOpen}>
               <DialogTrigger
-                render={<Button variant="outline" size="sm" />}
+                render={<Button variant="outline" size="sm" className="font-mono text-xs" />}
               >
                 <Scale className="mr-2 h-4 w-4" />
                 Appeal
               </DialogTrigger>
               <DialogContent className="max-w-lg">
                 <DialogHeader>
-                  <DialogTitle>Appeal Review</DialogTitle>
+                  <DialogTitle className="font-mono">Appeal Review</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleAppeal} className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Reason for appeal</Label>
+                    <Label className="font-mono text-xs">Reason for appeal</Label>
                     <textarea
-                      className="min-h-[100px] w-full rounded-md border border-border/40 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                      className="min-h-[100px] w-full rounded-md border border-border/40 bg-[#1e1e2e] px-3 py-2 font-mono text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary"
                       value={appealReason}
                       onChange={(e) => setAppealReason(e.target.value)}
                       placeholder="Explain why you believe findings are incorrect..."
@@ -162,10 +162,10 @@ export default function ReviewDetailPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Select disputed findings</Label>
+                    <Label className="font-mono text-xs">Select disputed findings</Label>
                     <div className="max-h-[200px] space-y-2 overflow-y-auto">
                       {findings.map((f: any) => (
-                        <label key={f.id} className="flex items-center gap-2 text-sm">
+                        <label key={f.id} className="flex items-center gap-2 font-mono text-sm">
                           <input
                             type="checkbox"
                             checked={selectedFindings.includes(f.id)}
@@ -179,7 +179,7 @@ export default function ReviewDetailPage() {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono"
                     disabled={appealing || selectedFindings.length === 0}
                   >
                     {appealing ? "Submitting..." : "Submit Appeal"}
@@ -197,15 +197,15 @@ export default function ReviewDetailPage() {
       {consensus && (
         <Card className="border-border/40">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
+            <CardTitle className="flex items-center gap-2 font-mono text-base">
+              <Terminal className="h-4 w-4 text-primary" />
               Consensus Result
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-5">
               <div>
-                <p className="text-sm text-muted-foreground">Risk Level</p>
+                <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Risk Level</p>
                 <Badge
                   className={severityColor(consensus.overall_risk)}
                   variant="outline"
@@ -214,32 +214,32 @@ export default function ReviewDetailPage() {
                 </Badge>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Confidence</p>
-                <p className="text-lg font-semibold">
+                <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Confidence</p>
+                <p className="font-mono text-lg font-semibold">
                   {(consensus.avg_confidence * 100).toFixed(0)}%
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Confirmed</p>
-                <p className="text-lg font-semibold text-red-600">
+                <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Confirmed</p>
+                <p className="font-mono text-lg font-semibold text-red-600">
                   {consensus.confirmed_count}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Disputed</p>
-                <p className="text-lg font-semibold text-yellow-600">
+                <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Disputed</p>
+                <p className="font-mono text-lg font-semibold text-yellow-600">
                   {consensus.disputed_count}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Dismissed</p>
-                <p className="text-lg font-semibold text-green-600">
+                <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Dismissed</p>
+                <p className="font-mono text-lg font-semibold text-green-600">
                   {consensus.dismissed_count}
                 </p>
               </div>
             </div>
             {consensus.chain_tx_hash && (
-              <p className="mt-4 text-xs text-muted-foreground">
+              <p className="mt-4 font-mono text-xs text-muted-foreground">
                 On-chain TX: {consensus.chain_tx_hash}
               </p>
             )}
@@ -249,14 +249,14 @@ export default function ReviewDetailPage() {
 
       <Card className="border-border/40">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileSearch className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 font-mono text-base">
+            <FileSearch className="h-4 w-4 text-primary" />
             Findings ({findings.length})
           </CardTitle>
         </CardHeader>
         <CardContent>
           {findings.length === 0 ? (
-            <p className="py-8 text-center text-muted-foreground">
+            <p className="py-8 text-center font-mono text-sm text-muted-foreground">
               {review.status === "done"
                 ? "No findings — your code looks clean!"
                 : "Findings will appear once analysis completes."}
@@ -271,7 +271,7 @@ export default function ReviewDetailPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
                       <AlertTriangle className="h-4 w-4 text-orange-600" />
-                      <h3 className="font-medium">{finding.title}</h3>
+                      <h3 className="font-mono text-sm font-medium">{finding.title}</h3>
                       {finding.false_positive_flag && (
                         <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 text-xs">
                           False Positive
@@ -310,11 +310,11 @@ export default function ReviewDetailPage() {
                       )}
                     </div>
                   </div>
-                  <p className="mt-2 text-sm text-muted-foreground">
+                  <p className="mt-2 font-mono text-sm text-muted-foreground">
                     {finding.description}
                   </p>
                   {finding.confidence !== null && (
-                    <p className="mt-2 text-xs text-muted-foreground">
+                    <p className="mt-2 font-mono text-xs text-muted-foreground">
                       Confidence: {(finding.confidence * 100).toFixed(0)}% &middot;{" "}
                       {finding.category}
                       {finding.line_start &&
@@ -324,7 +324,7 @@ export default function ReviewDetailPage() {
                   {finding.remediation && (
                     <>
                       <Separator className="my-3" />
-                      <p className="text-sm">
+                      <p className="font-mono text-sm">
                         <span className="font-medium text-primary">
                           Remediation:
                         </span>{" "}

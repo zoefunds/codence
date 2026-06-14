@@ -2,12 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { isAuthenticated, getUser, getAccessToken, setUser, clearAuth } from "@/lib/auth";
+import {
+  isAuthenticated,
+  getUser,
+  getAccessToken,
+  setUser,
+  clearAuth,
+} from "@/lib/auth";
 import { api, ApiError } from "@/lib/api";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Mail } from "lucide-react";
+import { Terminal, Mail } from "lucide-react";
 import { toast } from "sonner";
 
 function VerificationGate({ onVerified }: { onVerified: () => void }) {
@@ -55,21 +61,26 @@ function VerificationGate({ onVerified }: { onVerified: () => void }) {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-6">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md border-border/40">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 font-mono text-base">
             <Mail className="h-5 w-5 text-primary" />
             Verify Your Email
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p>We sent a verification link to <strong>{email}</strong></p>
-          <p className="text-sm text-muted-foreground">Check your inbox and click the link to continue.</p>
+          <p className="font-mono text-sm">
+            We sent a verification link to{" "}
+            <strong className="text-primary">{email}</strong>
+          </p>
+          <p className="font-mono text-xs text-muted-foreground">
+            Check your inbox and click the link to continue.
+          </p>
           <div className="flex flex-col gap-2">
             <Button
               onClick={handleResend}
               disabled={resending}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono text-sm"
             >
               {resending ? "Sending..." : "Resend Verification Email"}
             </Button>
@@ -77,14 +88,14 @@ function VerificationGate({ onVerified }: { onVerified: () => void }) {
               onClick={handleRefresh}
               disabled={checking}
               variant="outline"
-              className="w-full"
+              className="w-full font-mono text-sm"
             >
               {checking ? "Checking..." : "I've Verified"}
             </Button>
             <Button
               onClick={handleLogout}
               variant="ghost"
-              className="w-full"
+              className="w-full font-mono text-sm"
             >
               Logout
             </Button>
@@ -131,7 +142,7 @@ export default function DashboardLayout({
   if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
       </div>
     );
   }

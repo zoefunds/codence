@@ -24,7 +24,7 @@ import { api, ApiError } from "@/lib/api";
 import { statusColor, formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Plus, FileSearch } from "lucide-react";
+import { Plus, FileCode2, Terminal } from "lucide-react";
 
 const STATUS_FILTERS = [
   { value: "", label: "All" },
@@ -54,11 +54,16 @@ export default function ReviewsPage() {
     if (!token || !orgId) return;
     setListLoading(true);
     try {
-      const data: any = await api.listReviews(orgId, page, token, statusFilter || undefined);
+      const data: any = await api.listReviews(
+        orgId,
+        page,
+        token,
+        statusFilter || undefined
+      );
       setReviews(data.reviews || []);
       setTotal(data.total || 0);
     } catch {
-      // silent
+      /* silent */
     } finally {
       setListLoading(false);
     }
@@ -102,15 +107,15 @@ export default function ReviewsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Reviews</h1>
-          <p className="text-muted-foreground">
-            Submit and track consensus-driven AI code reviews.
+          <h1 className="font-mono text-2xl font-bold">Reviews</h1>
+          <p className="font-mono text-sm text-muted-foreground">
+            Submit and track consensus-driven code reviews.
           </p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger
             render={
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" />
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-mono text-sm" />
             }
           >
             <Plus className="mr-2 h-4 w-4" />
@@ -118,34 +123,44 @@ export default function ReviewsPage() {
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Submit Code for Review</DialogTitle>
+              <DialogTitle className="font-mono">
+                Submit Code for Review
+              </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Review Title</Label>
+                <Label htmlFor="title" className="font-mono text-xs">
+                  Review Title
+                </Label>
                 <Input
                   id="title"
                   placeholder="e.g. Auth middleware review"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
+                  className="font-mono text-sm"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="language">Language (optional)</Label>
+                <Label htmlFor="language" className="font-mono text-xs">
+                  Language (optional)
+                </Label>
                 <Input
                   id="language"
                   placeholder="e.g. python, javascript, solidity"
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
+                  className="font-mono text-sm"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="code">Source Code</Label>
+                <Label htmlFor="code" className="font-mono text-xs">
+                  Source Code
+                </Label>
                 <textarea
                   id="code"
-                  className="min-h-[200px] w-full rounded-md border border-border/40 bg-background px-3 py-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  placeholder="Paste your code here..."
+                  className="min-h-[200px] w-full rounded-md border border-border/40 bg-[#1e1e2e] px-4 py-3 font-mono text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="// Paste your code here..."
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                   required
@@ -153,7 +168,7 @@ export default function ReviewsPage() {
               </div>
               <Button
                 type="submit"
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono"
                 disabled={submitting}
               >
                 {submitting ? "Submitting..." : "Submit for Review"}
@@ -169,8 +184,15 @@ export default function ReviewsPage() {
             key={f.value}
             variant={statusFilter === f.value ? "default" : "outline"}
             size="sm"
-            onClick={() => { setStatusFilter(f.value); setPage(1); }}
-            className={statusFilter === f.value ? "bg-primary text-primary-foreground" : ""}
+            onClick={() => {
+              setStatusFilter(f.value);
+              setPage(1);
+            }}
+            className={`font-mono text-xs ${
+              statusFilter === f.value
+                ? "bg-primary text-primary-foreground"
+                : ""
+            }`}
           >
             {f.label}
           </Button>
@@ -179,25 +201,34 @@ export default function ReviewsPage() {
 
       <Card className="border-border/40">
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>All Reviews</span>
-            <span className="text-sm font-normal text-muted-foreground">{total} total</span>
+          <CardTitle className="flex items-center justify-between font-mono text-base">
+            <span className="flex items-center gap-2">
+              <Terminal className="h-4 w-4 text-primary" />
+              All Reviews
+            </span>
+            <span className="font-mono text-xs font-normal text-muted-foreground">
+              {total} total
+            </span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           {listLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
             </div>
           ) : reviews.length === 0 ? (
             <div className="py-12 text-center">
-              <FileSearch className="mx-auto h-12 w-12 text-muted-foreground/40" />
-              <p className="mt-4 text-muted-foreground">
-                {statusFilter ? "No reviews match this filter." : "No reviews yet. Submit your first code review to get started."}
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl border border-dashed border-border bg-muted/50">
+                <FileCode2 className="h-7 w-7 text-muted-foreground/40" />
+              </div>
+              <p className="mt-4 font-mono text-sm text-muted-foreground">
+                {statusFilter
+                  ? "No reviews match this filter."
+                  : "No reviews yet. Submit your first code review."}
               </p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {reviews.map((review: any) => (
                 <Link
                   key={review.id}
@@ -205,14 +236,19 @@ export default function ReviewsPage() {
                   className="flex items-center justify-between rounded-lg border border-border/40 p-4 transition-colors hover:bg-muted/50"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium">{review.title}</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="font-mono text-sm font-medium">
+                      {review.title}
+                    </p>
+                    <p className="font-mono text-xs text-muted-foreground">
                       {review.source}
-                      {review.language && <> &middot; {review.language}</>}
-                      {" "}&middot; {formatDate(review.created_at)}
+                      {review.language && <> &middot; {review.language}</>}{" "}
+                      &middot; {formatDate(review.created_at)}
                     </p>
                   </div>
-                  <Badge className={statusColor(review.status)} variant="outline">
+                  <Badge
+                    className={statusColor(review.status)}
+                    variant="outline"
+                  >
                     {review.status}
                   </Badge>
                 </Link>
@@ -227,10 +263,11 @@ export default function ReviewsPage() {
                 size="sm"
                 disabled={page <= 1}
                 onClick={() => setPage(page - 1)}
+                className="font-mono text-xs"
               >
                 Previous
               </Button>
-              <span className="text-sm text-muted-foreground">
+              <span className="font-mono text-xs text-muted-foreground">
                 Page {page} of {totalPages}
               </span>
               <Button
@@ -238,6 +275,7 @@ export default function ReviewsPage() {
                 size="sm"
                 disabled={page >= totalPages}
                 onClick={() => setPage(page + 1)}
+                className="font-mono text-xs"
               >
                 Next
               </Button>

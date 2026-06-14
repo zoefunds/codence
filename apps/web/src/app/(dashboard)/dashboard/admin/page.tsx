@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getAccessToken, getUser } from "@/lib/auth";
 import { api, ApiError } from "@/lib/api";
-import { Users, CheckCircle, FileSearch, Building2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Users, CheckCircle, FileSearch, Building2, ChevronLeft, ChevronRight, Terminal } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AdminPage() {
@@ -73,82 +73,85 @@ export default function AdminPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold">Admin</h1>
-        <p className="text-muted-foreground">Platform overview and user management.</p>
+        <h1 className="font-mono text-2xl font-bold">Admin</h1>
+        <p className="font-mono text-sm text-muted-foreground">Platform overview and user management.</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="border-border/40">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
+            <CardTitle className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground">TOTAL_USERS</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{stats?.total_users ?? 0}</p>
+            <p className="font-mono text-2xl font-bold">{stats?.total_users ?? 0}</p>
           </CardContent>
         </Card>
         <Card className="border-border/40">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Verified Users</CardTitle>
+            <CardTitle className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground">VERIFIED</CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{stats?.verified_users ?? 0}</p>
+            <p className="font-mono text-2xl font-bold">{stats?.verified_users ?? 0}</p>
           </CardContent>
         </Card>
         <Card className="border-border/40">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Reviews</CardTitle>
+            <CardTitle className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground">TOTAL_REVIEWS</CardTitle>
             <FileSearch className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{stats?.total_reviews ?? 0}</p>
+            <p className="font-mono text-2xl font-bold">{stats?.total_reviews ?? 0}</p>
           </CardContent>
         </Card>
         <Card className="border-border/40">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Organizations</CardTitle>
+            <CardTitle className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground">TOTAL_ORGS</CardTitle>
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{stats?.total_organizations ?? 0}</p>
+            <p className="font-mono text-2xl font-bold">{stats?.total_organizations ?? 0}</p>
           </CardContent>
         </Card>
       </div>
 
       <Card className="border-border/40">
         <CardHeader>
-          <CardTitle>Users</CardTitle>
+          <CardTitle className="flex items-center gap-2 font-mono text-base">
+            <Terminal className="h-4 w-4 text-primary" />
+            Users
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full font-mono text-sm">
               <thead>
                 <tr className="border-b border-border/40">
-                  <th className="pb-3 text-left font-medium text-muted-foreground">Email</th>
-                  <th className="pb-3 text-left font-medium text-muted-foreground">Display Name</th>
-                  <th className="pb-3 text-left font-medium text-muted-foreground">Verified</th>
-                  <th className="pb-3 text-left font-medium text-muted-foreground">Admin</th>
-                  <th className="pb-3 text-left font-medium text-muted-foreground">Joined</th>
-                  <th className="pb-3 text-right font-medium text-muted-foreground">Actions</th>
+                  <th className="pb-3 text-left text-xs font-medium uppercase tracking-widest text-muted-foreground">Email</th>
+                  <th className="pb-3 text-left text-xs font-medium uppercase tracking-widest text-muted-foreground">Name</th>
+                  <th className="pb-3 text-left text-xs font-medium uppercase tracking-widest text-muted-foreground">Verified</th>
+                  <th className="pb-3 text-left text-xs font-medium uppercase tracking-widest text-muted-foreground">Admin</th>
+                  <th className="pb-3 text-left text-xs font-medium uppercase tracking-widest text-muted-foreground">Joined</th>
+                  <th className="pb-3 text-right text-xs font-medium uppercase tracking-widest text-muted-foreground">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map((u) => (
                   <tr key={u.id} className="border-b border-border/20">
-                    <td className="py-3">{u.email}</td>
-                    <td className="py-3">{u.display_name || "—"}</td>
+                    <td className="py-3 text-sm">{u.email}</td>
+                    <td className="py-3 text-sm">{u.display_name || "—"}</td>
                     <td className="py-3">
-                      <Badge variant="outline">
+                      <Badge variant="outline" className="font-mono text-xs">
                         {u.email_verified ? "Yes" : "No"}
                       </Badge>
                     </td>
                     <td className="py-3">
-                      <Badge variant={u.is_admin ? "default" : "outline"}>
+                      <Badge variant={u.is_admin ? "default" : "outline"} className="font-mono text-xs">
                         {u.is_admin ? "Yes" : "No"}
                       </Badge>
                     </td>
-                    <td className="py-3 text-muted-foreground">
+                    <td className="py-3 text-sm text-muted-foreground">
                       {new Date(u.created_at).toLocaleDateString()}
                     </td>
                     <td className="py-3 text-right">
@@ -156,6 +159,7 @@ export default function AdminPage() {
                         size="sm"
                         variant={u.is_admin ? "destructive" : "outline"}
                         onClick={() => toggleAdmin(u.id, u.is_admin)}
+                        className="font-mono text-xs"
                       >
                         {u.is_admin ? "Remove Admin" : "Make Admin"}
                       </Button>
@@ -172,10 +176,11 @@ export default function AdminPage() {
                 variant="outline"
                 disabled={page <= 1}
                 onClick={() => setPage((p) => p - 1)}
+                className="font-mono"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="text-sm text-muted-foreground">
+              <span className="font-mono text-xs text-muted-foreground">
                 Page {page} of {totalPages}
               </span>
               <Button
@@ -183,6 +188,7 @@ export default function AdminPage() {
                 variant="outline"
                 disabled={page >= totalPages}
                 onClick={() => setPage((p) => p + 1)}
+                className="font-mono"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
