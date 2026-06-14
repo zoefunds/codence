@@ -17,6 +17,12 @@ const client = createClient({
   account: account,
 });
 
+function getClient(signerPrivateKey) {
+  if (!signerPrivateKey) return client;
+  const userAccount = createAccount(signerPrivateKey);
+  return createClient({ chain: studionet, account: userAccount });
+}
+
 app.get("/health", (req, res) => {
   res.json({ status: "ok", contract: CONTRACT_ADDRESS, account: account.address });
 });
@@ -29,9 +35,11 @@ app.post("/submit-review", async (req, res) => {
       review_id, code_hash, title, source,
       org_id, submitter_address, language,
       file_count, total_lines, total_bytes,
+      signer_private_key,
     } = req.body;
 
-    const txHash = await client.writeContract({
+    const c = getClient(signer_private_key);
+    const txHash = await c.writeContract({
       address: CONTRACT_ADDRESS,
       functionName: "submit_review",
       args: [
@@ -57,9 +65,10 @@ app.post("/submit-review", async (req, res) => {
 
 app.post("/analyze-review", async (req, res) => {
   try {
-    const { review_id, code_content, language } = req.body;
+    const { review_id, code_content, language, signer_private_key } = req.body;
 
-    const txHash = await client.writeContract({
+    const c = getClient(signer_private_key);
+    const txHash = await c.writeContract({
       address: CONTRACT_ADDRESS,
       functionName: "analyze_and_review",
       args: [review_id, code_content, language || "unknown"],

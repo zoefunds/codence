@@ -26,6 +26,7 @@ from app.schemas.review import (
     ReviewResponse,
 )
 from app.services.genlayer_service import genlayer
+from app.services.wallet_service import decrypt_private_key
 
 router = APIRouter(prefix="/reviews", tags=["reviews"])
 
@@ -48,7 +49,7 @@ async def _get_user_wallet(db: AsyncSession, user_id: uuid.UUID) -> Wallet:
     return wallet
 
 
-async def _run_chain_review(review_id: uuid.UUID, code_content: str, language: str, submit_tx_hash: str = ""):
+async def _run_chain_review(review_id: uuid.UUID, code_content: str, language: str, submit_tx_hash: str = "", signer_private_key: str = ""):
     async with async_session_factory() as db:
         try:
             result = await db.execute(select(Review).where(Review.id == review_id))
@@ -75,6 +76,7 @@ async def _run_chain_review(review_id: uuid.UUID, code_content: str, language: s
                 code_content=code_content,
                 language=language or "unknown",
                 from_address="",
+                signer_private_key=signer_private_key,
             )
 
             result = await db.execute(select(Review).where(Review.id == review_id))
@@ -181,6 +183,13 @@ async def create_review_paste(
     line_count = body.code.count("\n") + 1
     byte_count = len(body.code.encode())
 
+    signer_key_hex = ""
+    try:
+        raw_key = decrypt_private_key(wallet.encrypted_private_key, wallet.dek_wrap)
+        signer_key_hex = "0x" + raw_key.hex()
+    except Exception:
+        pass
+
     submit_tx_hash = ""
     try:
         submit_tx = await genlayer.submit_review(
@@ -194,6 +203,7 @@ async def create_review_paste(
             file_count=1,
             total_lines=line_count,
             total_bytes=byte_count,
+            signer_private_key=signer_key_hex,
         )
         submit_tx_hash = submit_tx
         review.chain_review_id = str(review.id)
@@ -209,6 +219,7 @@ async def create_review_paste(
         body.code,
         body.language or "unknown",
         submit_tx_hash,
+        signer_key_hex,
     )
 
     await db.refresh(review)

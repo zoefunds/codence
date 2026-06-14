@@ -30,8 +30,9 @@ class GenlayerService:
         file_count: int = 1,
         total_lines: int = 0,
         total_bytes: int = 0,
+        signer_private_key: str = "",
     ) -> str:
-        result = await self._bridge_call("/submit-review", {
+        payload = {
             "review_id": review_id,
             "code_hash": code_hash,
             "title": title,
@@ -42,7 +43,10 @@ class GenlayerService:
             "file_count": file_count,
             "total_lines": total_lines,
             "total_bytes": total_bytes,
-        })
+        }
+        if signer_private_key:
+            payload["signer_private_key"] = signer_private_key
+        result = await self._bridge_call("/submit-review", payload)
         return result.get("tx_hash", "")
 
     async def analyze_review(
@@ -51,12 +55,16 @@ class GenlayerService:
         code_content: str,
         language: str,
         from_address: str,
+        signer_private_key: str = "",
     ) -> str:
-        result = await self._bridge_call("/analyze-review", {
+        payload = {
             "review_id": review_id,
             "code_content": code_content,
             "language": language,
-        }, timeout=600)
+        }
+        if signer_private_key:
+            payload["signer_private_key"] = signer_private_key
+        result = await self._bridge_call("/analyze-review", payload, timeout=600)
         return result.get("tx_hash", "")
 
     async def wait_for_tx(self, tx_hash: str, status: str = "FINALIZED") -> dict:
