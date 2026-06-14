@@ -59,8 +59,8 @@ class GenlayerService:
         }, timeout=600)
         return result.get("tx_hash", "")
 
-    async def wait_for_tx(self, tx_hash: str) -> dict:
-        return await self._bridge_call("/wait-for-tx", {"tx_hash": tx_hash}, timeout=1200)
+    async def wait_for_tx(self, tx_hash: str, status: str = "FINALIZED") -> dict:
+        return await self._bridge_call("/wait-for-tx", {"tx_hash": tx_hash, "status": status}, timeout=1200)
 
     async def get_tx_status(self, tx_hash: str) -> dict:
         result = await self._bridge_call("/get-tx", {"tx_hash": tx_hash})

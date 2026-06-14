@@ -9,7 +9,7 @@ app.use(express.json({ limit: "5mb" }));
 const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS || "0x996Cb5Cba2A81dB0582D9b4B9bb7f4b7E4d8DB3F";
 const PORT = process.env.BRIDGE_PORT || 8001;
 
-const account = createAccount();
+const account = createAccount(process.env.BRIDGE_PRIVATE_KEY || undefined);
 console.log(`Service account address: ${account.address}`);
 
 const client = createClient({
@@ -161,11 +161,15 @@ app.post("/archive-review", async (req, res) => {
 
 app.post("/wait-for-tx", async (req, res) => {
   try {
-    const { tx_hash } = req.body;
+    const { tx_hash, status } = req.body;
+
+    const targetStatus = status === "ACCEPTED"
+      ? TransactionStatus.ACCEPTED
+      : TransactionStatus.FINALIZED;
 
     const receipt = await client.waitForTransactionReceipt({
       hash: tx_hash,
-      status: TransactionStatus.ACCEPTED,
+      status: targetStatus,
       interval: 10000,
       retries: 120,
     });

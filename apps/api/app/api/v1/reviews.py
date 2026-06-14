@@ -48,9 +48,19 @@ async def _get_user_wallet(db: AsyncSession, user_id: uuid.UUID) -> Wallet:
     return wallet
 
 
-async def _run_chain_review(review_id: uuid.UUID, code_content: str, language: str):
+async def _run_chain_review(review_id: uuid.UUID, code_content: str, language: str, submit_tx_hash: str = ""):
     async with async_session_factory() as db:
         try:
+            result = await db.execute(select(Review).where(Review.id == review_id))
+            review = result.scalar_one_or_none()
+            if not review:
+                return
+
+            if submit_tx_hash:
+                review.status = "ingesting"
+                await db.commit()
+                await genlayer.wait_for_tx(submit_tx_hash, status="FINALIZED")
+
             result = await db.execute(select(Review).where(Review.id == review_id))
             review = result.scalar_one_or_none()
             if not review:
@@ -76,7 +86,7 @@ async def _run_chain_review(review_id: uuid.UUID, code_content: str, language: s
             review.status = "consensus"
             await db.commit()
 
-            await genlayer.wait_for_tx(tx_hash)
+            await genlayer.wait_for_tx(tx_hash, status="FINALIZED")
 
             chain_findings = await genlayer.get_review_findings(str(review_id))
             chain_review = await genlayer.get_review(str(review_id))
@@ -171,6 +181,7 @@ async def create_review_paste(
     line_count = body.code.count("\n") + 1
     byte_count = len(body.code.encode())
 
+    submit_tx_hash = ""
     try:
         submit_tx = await genlayer.submit_review(
             review_id=str(review.id),
@@ -184,6 +195,7 @@ async def create_review_paste(
             total_lines=line_count,
             total_bytes=byte_count,
         )
+        submit_tx_hash = submit_tx
         review.chain_review_id = str(review.id)
         review.status = "ingesting"
     except Exception:
@@ -196,6 +208,7 @@ async def create_review_paste(
         review.id,
         body.code,
         body.language or "unknown",
+        submit_tx_hash,
     )
 
     await db.refresh(review)
