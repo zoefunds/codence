@@ -71,7 +71,7 @@ class Settings(BaseSettings):
     GITHUB_WEBHOOK_SECRET: str = ""
 
     # CORS
-    CORS_ORIGINS: list[str] = ["http://localhost:3000", "https://web-ten-beta-22.vercel.app"]
+    CORS_ORIGINS: list[str] = ["http://localhost:3000", "https://codence-app.vercel.app"]
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "case_sensitive": True}
 
